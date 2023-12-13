@@ -151,6 +151,11 @@ public class OradoresGUI extends javax.swing.JFrame {
         btnEliminar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
         btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
 
         btnMostrar.setBackground(new java.awt.Color(0, 0, 102));
         btnMostrar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -326,6 +331,12 @@ public class OradoresGUI extends javax.swing.JFrame {
         }                                    
     }//GEN-LAST:event_tablaDatosMouseClicked
 
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        eliminar();
+        nuevo();
+        mostrar();
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
     //Métodos (Lógica)
     
     public void nuevo(){ //Método para dejar en blanco los TextFields
@@ -333,6 +344,7 @@ public class OradoresGUI extends javax.swing.JFrame {
         txtEdad.setText("");
         txtCiudad.setText("");
         txtTema.setText("");
+        txtId.setText("");
     }
     
     public void agregar(String txtNombre, String txtEdad, String txtCiudad, String txtTema){
@@ -452,13 +464,40 @@ public class OradoresGUI extends javax.swing.JFrame {
         }
     }
     
+    public void eliminar(){
+        int filaSeleccionada = tablaDatos.getSelectedRow();
+        
+        if(filaSeleccionada == -1){
+            JOptionPane.showMessageDialog(null, "Debe seleccionar una fila");
+        }else{
+            int idEliminar = (int)tablaDatos.getValueAt(filaSeleccionada, 0);
+            
+            String sql = "DELETE FROM oradores WHERE id = " + idEliminar;
+            
+            try {
+                Main con = new Main();
+                Connection conexion = con.establecerConexion();
+                
+                Statement st = conexion.createStatement();
+                
+                int filasAfectadas = st.executeUpdate(sql);
+                
+                if(filasAfectadas > 0){
+                    JOptionPane.showMessageDialog(null, "Orador eliminado exitosamente!");
+                }else{
+                    JOptionPane.showMessageDialog(null, "No se pudo eliminar al orador");
+                }
+                
+                st.close();
+                conexion.close();
+                
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     
-    
-    
-    
-    
-    
-    
+
     
     //Main
     public static void main(String args[]) {
