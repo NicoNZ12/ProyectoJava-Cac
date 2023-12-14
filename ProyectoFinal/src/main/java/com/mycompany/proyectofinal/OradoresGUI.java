@@ -540,6 +540,7 @@ public class OradoresGUI extends javax.swing.JFrame {
             String line = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
             FileWriter cb = new FileWriter(filePath, true);
             cb.write(line);
+            cb.close();
 
             line = "<oradores>";
             FileWriter ap = new FileWriter(filePath, true);
@@ -564,6 +565,7 @@ public class OradoresGUI extends javax.swing.JFrame {
             cl.close();
 
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Ha ocurrido un error");
             e.printStackTrace();
         }
 
