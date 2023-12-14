@@ -31,5 +31,8 @@ public class Main {
         Main oradores = new Main();
         oradores.establecerConexion();
         
+        OradoresGUI form = new OradoresGUI();
+        form.setVisible(true);
+        
     }
 }

@@ -1,20 +1,28 @@
-
 package com.mycompany.proyectofinal;
 
+import java.awt.List;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class OradoresGUI extends javax.swing.JFrame {
 
-    
     public OradoresGUI() {
         initComponents();
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -187,8 +195,8 @@ public class OradoresGUI extends javax.swing.JFrame {
                 .addGap(59, 59, 59)
                 .addComponent(btnMostrar, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(61, 61, 61)
+                .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(51, 51, 51)
                 .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -290,7 +298,7 @@ public class OradoresGUI extends javax.swing.JFrame {
     private void txtIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdActionPerformed
 
     }//GEN-LAST:event_txtIdActionPerformed
-   
+
     //Acción de los botones
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         String nombre = txtNombre.getText();
@@ -300,16 +308,31 @@ public class OradoresGUI extends javax.swing.JFrame {
         agregar(nombre, edad, ciudad, tema);
         nuevo();
         mostrar();
+        try {
+            crearXML();
+        } catch (IOException ex) {
+            Logger.getLogger(OradoresGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void btnMostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarActionPerformed
         mostrar();
+        try {
+            crearXML();
+        } catch (IOException ex) {
+            Logger.getLogger(OradoresGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnMostrarActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
         actualizar();
         nuevo();
         mostrar();
+        try {
+            crearXML();
+        } catch (IOException ex) {
+            Logger.getLogger(OradoresGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void tablaDatosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaDatosMouseClicked
@@ -328,31 +351,35 @@ public class OradoresGUI extends javax.swing.JFrame {
             txtEdad.setText("" + edad);
             txtCiudad.setText(ciudad);
             txtTema.setText(tema);
-        }                                    
+        }
     }//GEN-LAST:event_tablaDatosMouseClicked
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         eliminar();
         nuevo();
         mostrar();
+        try {
+            crearXML();
+        } catch (IOException ex) {
+            Logger.getLogger(OradoresGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     //Métodos (Lógica)
-    
-    public void nuevo(){ //Método para dejar en blanco los TextFields
+    public void nuevo() { //Método para dejar en blanco los TextFields
         txtNombre.setText("");
         txtEdad.setText("");
         txtCiudad.setText("");
         txtTema.setText("");
         txtId.setText("");
     }
-    
-    public void agregar(String txtNombre, String txtEdad, String txtCiudad, String txtTema){
+
+    public void agregar(String txtNombre, String txtEdad, String txtCiudad, String txtTema) {
         String sql = "INSERT INTO oradores(nombre, edad, ciudad, tema) VALUES(?, ?, ?, ?)";
 
         Main con = new Main();
         Connection conexion = con.establecerConexion();
-        
+
         try {
             PreparedStatement preparedStatement = conexion.prepareStatement(sql);
             preparedStatement.setString(1, txtNombre);
@@ -374,9 +401,9 @@ public class OradoresGUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
-    public void mostrar(){
-         String sql = "SELECT * FROM oradores";
+
+    public void mostrar() {
+        String sql = "SELECT * FROM oradores";
 
         Main con = new Main();
         Connection conexion = con.establecerConexion();
@@ -384,7 +411,7 @@ public class OradoresGUI extends javax.swing.JFrame {
         System.out.println(sql);
 
         DefaultTableModel model = new DefaultTableModel();
-        
+
         try {
             Statement st = conexion.createStatement();
 
@@ -408,7 +435,7 @@ public class OradoresGUI extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
+
     public int obtenerId() {
         int filaSeleccionada = tablaDatos.getSelectedRow();
 
@@ -420,13 +447,13 @@ public class OradoresGUI extends javax.swing.JFrame {
         int id = (int) tablaDatos.getValueAt(filaSeleccionada, 0);
         return id;
     }
-    
-    public void actualizar(){
+
+    public void actualizar() {
         String nuevoNombre = txtNombre.getText();
         String nuevaEdad = txtEdad.getText();
         String nuevaCiudad = txtCiudad.getText();
         String nuevoTema = txtTema.getText();
-        
+
         if (nuevoNombre.isEmpty() || nuevaEdad.isEmpty() || nuevaCiudad.isEmpty() || nuevoTema.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Debe ingresar los nuevos datos");
         } else {
@@ -463,74 +490,117 @@ public class OradoresGUI extends javax.swing.JFrame {
             }
         }
     }
-    
-    public void eliminar(){
+
+    public void eliminar() {
         int filaSeleccionada = tablaDatos.getSelectedRow();
-        
-        if(filaSeleccionada == -1){
+
+        if (filaSeleccionada == -1) {
             JOptionPane.showMessageDialog(null, "Debe seleccionar una fila");
-        }else{
-            int idEliminar = (int)tablaDatos.getValueAt(filaSeleccionada, 0);
-            
+        } else {
+            int idEliminar = (int) tablaDatos.getValueAt(filaSeleccionada, 0);
+
             String sql = "DELETE FROM oradores WHERE id = " + idEliminar;
-            
+
             try {
                 Main con = new Main();
                 Connection conexion = con.establecerConexion();
-                
+
                 Statement st = conexion.createStatement();
-                
+
                 int filasAfectadas = st.executeUpdate(sql);
-                
-                if(filasAfectadas > 0){
+
+                if (filasAfectadas > 0) {
                     JOptionPane.showMessageDialog(null, "Orador eliminado exitosamente!");
-                }else{
+                } else {
                     JOptionPane.showMessageDialog(null, "No se pudo eliminar al orador");
                 }
-                
+
                 st.close();
                 conexion.close();
-                
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
     }
-    
 
-    
-    //Main
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+    //Archivo XML
+    public void crearXML() throws IOException {
+        String filePath = "C:/Users/54260/ProyectoJava-Cac/oradores.xml";
+
+        Path path = Paths.get(filePath);
+        Files.delete(path);
+
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(OradoresGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(OradoresGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(OradoresGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(OradoresGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+            Main con = new Main();
+            Connection conexion = con.establecerConexion();
+            PreparedStatement pst = conexion.prepareStatement("SELECT * FROM oradores");
+            ResultSet rs = pst.executeQuery();
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new OradoresGUI().setVisible(true);
+            String line = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+            FileWriter cb = new FileWriter(filePath, true);
+            cb.write(line);
+
+            line = "<oradores>";
+            FileWriter ap = new FileWriter(filePath, true);
+            ap.write(line);
+            ap.close();
+
+            while (rs.next()) {
+                line = "<orador>" 
+                        + "<nombre>" + rs.getString("nombre") + "</nombre>" 
+                        + "<edad>" + rs.getString("edad") + "</edad>"
+                        + "<ciudad>" + rs.getString("ciudad") + "</ciudad>"
+                        + "<tema>" + rs.getString("tema") + "</tema>"
+                        + "</orador>";
+                FileWriter fw = new FileWriter(filePath, true);
+                fw.write(line);
+                fw.close();
             }
-        });
+
+            line = "</oradores>";
+            FileWriter cl = new FileWriter(filePath, true);
+            cl.write(line);
+            cl.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
+
+    //Main
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(OradoresGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(OradoresGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(OradoresGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(OradoresGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the form */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                new OradoresGUI().setVisible(true);
+//            }
+//        });
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel IdLabel;
